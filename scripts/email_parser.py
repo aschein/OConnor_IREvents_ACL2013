@@ -64,6 +64,8 @@ class EmailParser:
                         else:
                             sep = "-----------------"
                             print sep
+                            print lines[idx - 1]
+                            print lines[idx]
                             print lines[idx + 1]
                             print lines[idx + 2]
                             print lines[idx + 3]
