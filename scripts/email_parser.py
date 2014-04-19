@@ -55,6 +55,10 @@ class EmailParser:
                             sep = "\n-----------------\n"
                             self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, ' '.join(lines), sep))
                             break
+                        else:
+                            print sep
+                            print ' '.join(lines)
+                            print sep
                     except IndexError:
                         pass
         assert flag
