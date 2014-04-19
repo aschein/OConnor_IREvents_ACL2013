@@ -56,6 +56,7 @@ class EmailParser:
                     fr = lines[2].rstrip().split('From: ', 1)[1]
                     to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
                 except IndexError:
+                    print '********************'
                     print ' '.join(lines)
                     continue
                 self.messages[mi] = (ts, fr, to, body)
