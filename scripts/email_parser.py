@@ -68,7 +68,7 @@ class EmailParser:
                     fr = lines[2].rstrip().split('From: ', 1)[1]
                     to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
                 except IndexError:
-                    self.logger.error('Unexpected header lines:%s\t\t\t\n%s'%(full_path, ' '.join(lines[:6])))
+                    self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s'%(full_path, ' '.join(lines[:6])))
                     continue
                 self.messages[mi] = (ts, fr, to, body)
 
