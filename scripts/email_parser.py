@@ -1,6 +1,7 @@
 import os
 import re
 from collections import defaultdict
+import logging
 
 # DATA_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
 # OUT_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
@@ -13,10 +14,20 @@ class EmailParser:
         self.messages = {} # key = MID, value = (Timestamp, From, [To], Body)
         self.file_count = 0
 
+        self.logger = logging.getLogger('email_parser')
+        hdlr = logging.FileHandler(os.path.join(out_dir, 'email_parser.log'))
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        self.logger.addHandler(hdlr)
+        self.logger.setLevel(logging.INFO)
+        self.logger.info('Initialized.')
+
     def recursive_walk(self, data_dir):
         for root, dirs, files in os.walk(data_dir):
+            if dirs and not sum(['sent' in x for x in dirs]):
+                self.logger.warning('No sent folder found in:\n\t\t\t%s'%root)
             if 'sent' not in root:
-                continue
+                continue    
             for f in files:
                 self.file_count += 1
                 yield os.path.join(root, f)
@@ -43,12 +54,11 @@ class EmailParser:
         for full_path in self.recursive_walk(data_dir):
             with open(full_path, 'r') as f:
                 lines = f.readlines()
-                # TODO: write a testcase for MID collision
                 if 'Message-ID' not in lines[0]:
                     continue
                 mi = lines[0].rstrip().split('Message-ID: ', 1)[1]
                 if mi in self.messages:
-                    print 'D00PZ!'
+                    self.logger.info('Found duplicated MID.')
                     continue
                 body = self.get_body(lines)
                 if len(body) == 0:
@@ -58,8 +68,7 @@ class EmailParser:
                     fr = lines[2].rstrip().split('From: ', 1)[1]
                     to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
                 except IndexError:
-                    print '********************'
-                    print ' '.join(lines)
+                    self.logger.error('Unexpected header lines:%s\t\t\t\n%s'%(full_path, ' '.join(lines[:6])))
                     continue
                 self.messages[mi] = (ts, fr, to, body)
 
@@ -101,6 +110,7 @@ if __name__ == '__main__':
     e.parse()
     e.serialize()
     end = time.time() - start
+    e.logger.info('Completed job for %d files in %f secs.'%(e.file_count, end))
     print 'Completed job for %d files in %f secs.'%(e.file_count, end)
 
 
