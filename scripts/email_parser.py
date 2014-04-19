@@ -57,10 +57,11 @@ class EmailParser:
                 if reg_2.search(line.strip()) is not None:
                     try:
                         if reg_3.search(lines[idx + 1].strip()) is not None:
-
-                            print 'DELETING: %s'%main_lines.pop()
+                            main_lines.pop()
+                            # print 'DELETING: %s'%main_lines.pop()
                             sep = '\n-----------------\n'
-                            self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, ' '.join(lines), sep))
+                            self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, '\n'.join(lines), sep))
+                            self.logger.warning('Printed:%s%s%s'%(sep, ' '.join(main_lines), sep))
                             break
                         else:
                             sep = '-----------------'
