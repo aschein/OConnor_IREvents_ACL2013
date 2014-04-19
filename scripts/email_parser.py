@@ -51,9 +51,13 @@ class EmailParser:
                 body = self.get_body(lines)
                 if len(body) == 0:
                     continue
-                ts = lines[1].rstrip().split('Date: ', 1)[1]
-                fr = lines[2].rstrip().split('From: ', 1)[1]
-                to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
+                try:
+                    ts = lines[1].rstrip().split('Date: ', 1)[1]
+                    fr = lines[2].rstrip().split('From: ', 1)[1]
+                    to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
+                except IndexError:
+                    print ' '.join(lines)
+                    continue
                 self.messages[mi] = (ts, fr, to, body)
 
                 for line in lines:
