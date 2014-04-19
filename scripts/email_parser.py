@@ -50,19 +50,20 @@ class EmailParser:
                 continue
             if flag:
                 if reg_1.search(line.strip()) is not None:
-                    sep = "\n-----------------\n"
+                    sep = '\n-----------------\n'
                     self.logger.info('Found thread text:%s%s%s'%(sep, ' '.join(lines), sep))
                     break
                 main_lines.append(line.strip())
                 if reg_2.search(line.strip()) is not None:
                     try:
                         if reg_3.search(lines[idx + 1].strip()) is not None:
-                            main_lines.pop()
-                            sep = "\n-----------------\n"
+
+                            print 'DELETING: %s'%main_lines.pop()
+                            sep = '\n-----------------\n'
                             self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, ' '.join(lines), sep))
                             break
                         else:
-                            sep = "-----------------"
+                            sep = '-----------------'
                             print sep
                             print lines[idx - 1]
                             print lines[idx]
@@ -97,7 +98,7 @@ class EmailParser:
                     fr = lines[2].rstrip().split('From: ', 1)[1]
                     to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
                 except IndexError:
-                    sep = "\n-----------------\n"
+                    sep = '\n-----------------\n'
                     self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s%s%s'%(full_path, sep, ' '.join(lines[:20]), sep))
                     continue
                 self.messages[mi] = (ts, fr, to, body)
