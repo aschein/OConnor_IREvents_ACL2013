@@ -60,8 +60,7 @@ class EmailParser:
                             main_lines.pop()
                             # print 'DELETING: %s'%main_lines.pop()
                             sep = '\n-----------------\n'
-                            self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, '\n'.join(lines), sep))
-                            self.logger.warning('Printed:%s%s%s'%(sep, ' '.join(main_lines), sep))
+                            self.logger.warning('Found TRICKY thread text:%s%s%sEXTRACTED:\n%s%s'%(sep, '\n'.join(lines), sep, ' '.join(main_lines), sep))
                             break
                         else:
                             sep = '-----------------'
