@@ -33,7 +33,9 @@ class EmailParser:
                 yield os.path.join(root, f)
 
     def get_body(self, lines):
-        reg = re.compile('on [0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}|^----')
+        reg_1 = re.compile('on [0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}|^----')
+        reg_2 = re.compile('[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2} [A-P]{1}M')
+        reg_3 = re.compile('^To: ')
         main_lines = []
         flag = False
         for idx, line in enumerate(lines):
@@ -41,9 +43,20 @@ class EmailParser:
                 flag = True
                 continue
             if flag:
-                if reg.search(line.strip()) is not None:
+                if reg_1.search(line.strip()) is not None:
+                    sep = "\n-----------------\n"
+                    self.logger.info('Found thread text:%s%s%s'(sep, ' '.join(lines), sep))
                     break
                 main_lines.append(line.strip())
+                if reg_2.search(line.strip()) is not None:
+                    try:
+                        if reg_3.search(lines[idx + 1].strip()) is not None:
+                            main_lines.pop()
+                            sep = "\n-----------------\n"
+                            self.logger.warning('Found TRICKY thread text:%s%s%s'(sep, ' '.join(lines), sep))
+                            break
+                    except IndexError:
+                        pass
         assert flag
         return (' '.join(main_lines)).strip()
 
