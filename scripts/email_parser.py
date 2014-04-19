@@ -41,7 +41,7 @@ class EmailParser:
     def get_body(self, lines):
         reg_1 = re.compile('on [0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}|^----')
         reg_2 = re.compile('[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2} [A-P]{1}M')
-        reg_3 = re.compile('^To:|^Sent by')
+        reg_3 = re.compile('^To:|^Sent by|=09')
         main_lines = []
         flag = False
         for idx, line in enumerate(lines):
