@@ -11,10 +11,12 @@ class EmailParser:
         self.out_dir = out_dir
         self.entities = defaultdict(set) # key = email, value = set(known aliases)
         self.messages = {} # key = MID, value = (Timestamp, From, [To], Body)
+        self.file_count = 0
 
     def recursive_walk(self, data_dir):
         for root, dirs, files in os.walk(data_dir):
             for f in files:
+                self.file_count += 1
                 yield os.path.join(root, f)
 
     def get_body(self, lines):
@@ -75,6 +77,7 @@ class EmailParser:
                 f.write('%s|%s|%s|%s|%s\n'%(mid, ts, fr, to, body))
 
 if __name__ == '__main__':
+    import time
     from argparse import ArgumentParser
     from path import path
 
@@ -86,9 +89,12 @@ if __name__ == '__main__':
 
     args = p.parse_args()
 
+    start = time.time()
     e = EmailParser(args.data, args.out)
     e.parse()
     e.serialize()
+    end = time.time() - start
+    print 'Completed job for %d files in %f secs.'%(e.file_count, end)
 
 
 
