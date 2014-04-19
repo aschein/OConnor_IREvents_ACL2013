@@ -57,6 +57,8 @@ class EmailParser:
                 if 'Message-ID' not in lines[0]:
                     continue
                 mi = lines[0].rstrip().split('Message-ID: ', 1)[1]
+                if mi == '<24747979.1075854727094.JavaMail.evans@thyme>':
+                    print full_path
                 if mi in self.messages:
                     self.logger.info('Found duplicated MID.')
                     continue
