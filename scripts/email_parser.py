@@ -15,6 +15,8 @@ class EmailParser:
 
     def recursive_walk(self, data_dir):
         for root, dirs, files in os.walk(data_dir):
+            if 'sent' not in root:
+                continue
             for f in files:
                 self.file_count += 1
                 yield os.path.join(root, f)
