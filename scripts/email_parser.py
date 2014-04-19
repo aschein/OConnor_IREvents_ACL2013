@@ -58,7 +58,7 @@ class EmailParser:
                         else:
                             sep = "\n-----------------\n"
                             print sep
-                            print ' '.join(lines)
+                            print lines[idx + 1]
                             print sep
                     except IndexError:
                         pass
