@@ -19,6 +19,7 @@ class EmailParser:
         self.entities = defaultdict(set) # key = email, value = set(known aliases)
         self.messages = {} # key = MID, value = (Timestamp, From, [To], Body)
         self.file_count = 0
+        self.good_file_count = 0
 
         self.logger = logging.getLogger('email_parser')
         hdlr = logging.FileHandler(os.path.join(out_dir, 'email_parser.log'))
@@ -62,15 +63,15 @@ class EmailParser:
                             sep = '\n-----------------\n'
                             self.logger.warning('Found TRICKY thread text:%s%s%sEXTRACTED:\n%s%s'%(sep, '\n'.join(lines), sep, ' '.join(main_lines), sep))
                             break
-                        else:
-                            sep = '-----------------'
-                            print sep
-                            print lines[idx - 1]
-                            print lines[idx]
-                            print lines[idx + 1]
-                            print lines[idx + 2]
-                            print lines[idx + 3]
-                            print sep
+                        # else:
+                        #     sep = '-----------------'
+                        #     print sep
+                        #     print lines[idx - 1]
+                        #     print lines[idx]
+                        #     print lines[idx + 1]
+                        #     print lines[idx + 2]
+                        #     print lines[idx + 3]
+                        #     print sep
                     except IndexError:
                         pass
         assert flag
@@ -102,6 +103,7 @@ class EmailParser:
                     self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s%s%s'%(full_path, sep, ' '.join(lines[:20]), sep))
                     continue
                 self.messages[mi] = (ts, fr, to, body)
+                self.good_file_count += 1
 
                 for line in lines:
                     if 'X-From' in line:
@@ -141,8 +143,8 @@ if __name__ == '__main__':
     e.parse()
     e.serialize()
     end = time.time() - start
-    e.logger.info('Completed job for %d files in %f secs.'%(e.file_count, end))
-    print 'Completed job for %d files in %f secs.'%(e.file_count, end)
+    e.logger.info('Completed job for %d files out of %d total files in %f secs.'%(e.good_file_count, e.file_count, end))
+    print 'Completed job for %d files out of %d total files in %f secs.'%(e.good_file_count, e.file_count, end)
 
 
 
