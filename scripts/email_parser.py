@@ -6,6 +6,12 @@ import logging
 # DATA_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
 # OUT_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
 
+def nonblank_lines(f):
+    for l in f:
+        line = l.rstrip()
+        if line:
+            yield line
+
 class EmailParser:
     def __init__(self, data_dir, out_dir):
         self.data_dir = data_dir
@@ -73,12 +79,13 @@ class EmailParser:
 
         for full_path in self.recursive_walk(data_dir):
             with open(full_path, 'r') as f:
-                lines = f.readlines()
+                lines = list(nonblank_lines(f))
                 if 'Message-ID' not in lines[0]:
+                    self.logger.warning('MID not found in:\n\t\t\t%s'%full_path)
                     continue
                 mi = lines[0].rstrip().split('Message-ID: ', 1)[1]
                 if mi in self.messages:
-                    self.logger.info('Found duplicated MID.')
+                    self.logger.info('Found duplicated MID in:\n\t\t\t%s'%full_path)
                     continue
                 body = self.get_body(lines)
                 if len(body) == 0:
