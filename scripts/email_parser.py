@@ -79,14 +79,14 @@ if __name__ == '__main__':
     from path import path
 
     p = ArgumentParser()
-    p.add_argument('--data_dir', type=path, required=True,
+    p.add_argument('--data', type=path, required=True,
                    help='directory to search recursively within for email files')
-    p.add_argument('--out_dir', type=path, required=True,
+    p.add_argument('--out', type=path, required=True,
                    help='directory to serialize results to')
-    
+
     args = p.parse_args()
 
-    e = EmailParser(args.data_dir, args.out_dir)
+    e = EmailParser(args.data, args.out)
     e.parse()
     e.serialize()
 
