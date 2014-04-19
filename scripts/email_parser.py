@@ -45,7 +45,7 @@ class EmailParser:
             if flag:
                 if reg_1.search(line.strip()) is not None:
                     sep = "\n-----------------\n"
-                    self.logger.info('Found thread text:%s%s%s'(sep, ' '.join(lines), sep))
+                    self.logger.info('Found thread text:%s%s%s'%(sep, ' '.join(lines), sep))
                     break
                 main_lines.append(line.strip())
                 if reg_2.search(line.strip()) is not None:
@@ -53,7 +53,7 @@ class EmailParser:
                         if reg_3.search(lines[idx + 1].strip()) is not None:
                             main_lines.pop()
                             sep = "\n-----------------\n"
-                            self.logger.warning('Found TRICKY thread text:%s%s%s'(sep, ' '.join(lines), sep))
+                            self.logger.warning('Found TRICKY thread text:%s%s%s'%(sep, ' '.join(lines), sep))
                             break
                     except IndexError:
                         pass
