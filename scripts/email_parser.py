@@ -2,8 +2,8 @@ import os
 import re
 from collections import defaultdict
 
-DATA_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
-OUT_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
+# DATA_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
+# OUT_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
 
 class EmailParser:
     def __init__(self, data_dir, out_dir):
@@ -75,7 +75,18 @@ class EmailParser:
                 f.write('%s|%s|%s|%s|%s\n'%(mid, ts, fr, to, body))
 
 if __name__ == '__main__':
-    e = EmailParser(DATA_DIR, OUT_DIR)
+    from argparse import ArgumentParser
+    from path import path
+
+    p = ArgumentParser()
+    p.add_argument('--data_dir', type=path, required=True,
+                   help='directory to search recursively within for email files')
+    p.add_argument('--out_dir', type=path, required=True,
+                   help='directory to serialize results to')
+    
+    args = p.parse_args()
+
+    e = EmailParser(args.data_dir, args.out_dir)
     e.parse()
     e.serialize()
 
