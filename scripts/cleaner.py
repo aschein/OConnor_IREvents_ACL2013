@@ -6,7 +6,7 @@ if __name__ == '__main__':
     with open(entity_file, 'r') as f:
         lines = f.readlines()[1:]
         for line in lines:
-            entities.append(lines.split('|')[0])
+            entities.append(line.split('|')[0])
 
     assert len(entities) == 300
 
