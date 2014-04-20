@@ -22,6 +22,3 @@ if __name__ == '__main__':
         hits += 1
 
     print '%f proportion hits'%(hits/float(len(lines)))
-
-
-
