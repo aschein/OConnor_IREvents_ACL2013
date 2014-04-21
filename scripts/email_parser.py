@@ -22,7 +22,7 @@ class EmailParser:
         self.good_file_count = 0
 
         self.logger = logging.getLogger('email_parser')
-        hdlr = logging.FileHandler(os.path.join(out_dir, 'email_parser.log'))
+        hdlr = logging.FileHandler(os.path.join(out_dir, '3_email_parser.log'))
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
         hdlr.setFormatter(formatter)
         self.logger.addHandler(hdlr)
@@ -31,10 +31,10 @@ class EmailParser:
 
     def recursive_walk(self, data_dir):
         for root, dirs, files in os.walk(data_dir):
-            if dirs and not sum(['sent' in x for x in dirs]):
-                self.logger.warning('No sent folder found in:\n\t\t\t%s'%root)
-            if 'sent' not in root:
-                continue    
+            # if dirs and not sum(['sent' in x for x in dirs]):
+            #     self.logger.warning('No sent folder found in:\n\t\t\t%s'%root)
+            # if 'sent' not in root:
+            #     continue    
             for f in files:
                 self.file_count += 1
                 yield os.path.join(root, f)
@@ -82,6 +82,7 @@ class EmailParser:
             data_dir = self.data_dir
 
         for full_path in self.recursive_walk(data_dir):
+            # print full_path
             with open(full_path, 'r') as f:
                 lines = list(nonblank_lines(f))
                 if 'Message-ID' not in lines[0]:
@@ -100,7 +101,12 @@ class EmailParser:
                     to = lines[3].rstrip().split('To: ', 1)[1].split(', ')
                 except IndexError:
                     sep = '\n-----------------\n'
-                    self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s%s%s'%(full_path, sep, ' '.join(lines[:20]), sep))
+                    try:
+                        self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s%s%s'%(full_path, sep, ' '.join(lines[:20]), sep))
+                    except UnicodeDecodeError:
+                        self.logger.error('Unexpected header lines:\n\t\t\t%s\nUnicode error.'%(full_path))
+                    continue
+                if not '@enron' in fr.lower():
                     continue
                 self.messages[mi] = (ts, fr, to, body)
                 self.good_file_count += 1
@@ -115,12 +121,12 @@ class EmailParser:
         if out_dir is None:
             out_dir = self.out_dir
 
-        with open(os.path.join(out_dir, 'entities.tsv'), 'w+') as f:
+        with open(os.path.join(out_dir, '3_entities.tsv'), 'w+') as f:
             f.write('EMAIL|ALIASES\n')
             for email, aliases in self.entities.iteritems():
                 f.write('%s|%s\n'%(email, '|'.join(aliases)))
 
-        with open(os.path.join(out_dir, 'messages.txt'), 'w+') as f:
+        with open(os.path.join(out_dir, '3_messages.txt'), 'w+') as f:
             f.write('MID|TIME|FROM|TO|BODY\n')
             for mid, (ts, fr, to, body) in self.messages.iteritems():
                 f.write('%s|%s|%s|%s|%s\n'%(mid, ts, fr, to, body))
