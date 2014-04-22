@@ -2,11 +2,11 @@ numThreads = 2
 numFrames = 10
 pathFile = data/v7.pathfil.dthresh=500.pthresh=10
 dateFile = data/datefile.week
-contextModel = FrameSmoother
+contextModel = ScaleSmoother
 numDims = 1
-maxIter = 50000
-displayEvery = 500
-saveEvery = 1000
+maxIter = 20
+displayEvery = 100
+saveEvery = 200
 concResampleEvery = 100
 transVar = 1
 etaVar = 1

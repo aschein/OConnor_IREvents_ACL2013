@@ -179,7 +179,7 @@ public class ContextModel implements Serializable {
 				}
 				
 			}
-			U.p("eta_accept_ratio " + 1.0*numAccept / (endC-startC));
+//			U.p("eta_accept_ratio " + 1.0*numAccept / (endC-startC));
 		}
 		
 		@Override

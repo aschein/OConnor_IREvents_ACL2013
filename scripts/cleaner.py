@@ -1,8 +1,9 @@
 if __name__ == '__main__':
     from pandas import Timestamp
+    from collections import defaultdict
 
-    entity_file = '/mnt/nfs/work1/wallach/aschein/data/enron/preproc/2_entities.tsv'
-    messages_file = '/mnt/nfs/work1/wallach/aschein/data/enron/preproc/2_messages.txt'
+    entity_file = '/mnt/nfs/work1/wallach/aschein/data/enron/preproc/3_entities.tsv'
+    messages_file = '/mnt/nfs/work1/wallach/aschein/data/enron/preproc/3_messages.txt'
 
     entities = []
     with open(entity_file, 'r') as f:
@@ -10,34 +11,45 @@ if __name__ == '__main__':
         for line in lines:
             entities.append(line.split('|')[0])
 
-    # assert len(entities) == 300
     print "%d entities"%len(entities)
-    # assert sum(['@enron' not in e.lower() for e in entities]) == 0
-    # for e in entities:
-    #     if '@enron' not in e.lower():
-    #         print e
-    print sum(['@enron' in e.lower() for e in entities])/float(len(entities))
-    for e in entities:
-        if '@enron' in e.lower():
-            print e
 
     with open(messages_file, 'r') as f:
         lines = f.readlines()[1:]
 
     hits = 0
-
     times = []
 
-    for line in lines:
-        to = [x[1:-1] for x in line.split('|')[3][1:-1].split(',')]
-        if not sum([t in entities for t in to]):
-            continue
-        hits += 1
-        times.append(Timestamp(line.split('|')[1]))
+    check_ts = Timestamp('19900101 00:00')
+    shitty_ts = 0
 
+    dyads = defaultdict(int)
+
+    for line in lines:
+        fr = line.split('|')[2]
+        assert fr in entities
+        to = [x[1:-1] for x in line.split('|')[3][1:-1].split(',')]
+        if not len(to) == 1:
+            continue
+        if not to[0] in entities:
+            continue
+        ts = Timestamp(line.split('|')[1])
+        if ts.year < check_ts.year:
+            shitty_ts += 1
+            continue
+        dyads[(fr, to[0])] += 1
+        hits += 1
+        times.append(ts)
     times.sort()
+
+    dyad_items = dyads.items()
+    dyad_items.sort(key=lambda x: x[1], reverse=True)
+    for i in dyad_items[:100]:
+        print i
+
+
 
     print '%d documents'%(hits)
     print 'Dates range from %s to %s'%(str(times[0]), str(times[-1]))
     print '%f proportion hits'%(hits/float(len(lines)))
+    print '%f proportion of bogus dates'%(shitty_ts/float(len(lines)))
 

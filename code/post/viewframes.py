@@ -53,7 +53,7 @@ print "<tbody>"
 print
 
 for k in frameorder:
-    top_paths = (-path_frames[:,k]).argsort()[:20]
+    top_paths = (-path_frames[:,k]).argsort()[:100]
     top_paths = top_paths[ path_frames[top_paths,k] >= wc_thresh]
     pathelts = [util.nicepath(x) for x in path_vocab[top_paths]]
     # pathelts = ["%s <span class=wordinfo>(%.0f)</span>" % (util.nicepath(path_vocab[i]), path_frames[i,k]) for i in top_paths]
