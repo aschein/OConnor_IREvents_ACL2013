@@ -1,12 +1,12 @@
 numThreads = 2
 numFrames = 10
-pathFile = data/v7.pathfil.dthresh=500.pthresh=10
-dateFile = data/datefile.week
+pathFile = OConnor_IREvents_ACL2013/data/v7.pathfil.dthresh=500.pthresh=10
+dateFile = OConnor_IREvents_ACL2013/data/datefile.week
 contextModel = ScaleSmoother
 numDims = 1
-maxIter = 20
+maxIter = 3
 displayEvery = 100
-saveEvery = 200
+saveEvery = 1
 concResampleEvery = 100
 transVar = 1
 etaVar = 1

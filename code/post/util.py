@@ -1,8 +1,68 @@
 import re,sys,json
 
+def blue(s): return '<FONT COLOR="0000FF">%s</FONT>'%s 
+def green(s): return '<FONT COLOR="196C19">%s</FONT>'%s
+def red(s): return '<FONT COLOR="FF6600">%s</FONT>'%s
+
+'I<-nsubj-BLAH<-fljf-BLAH-alj->YOU'
+
+def nicepath4(pathstr):
+    left = '&larr;'
+    right = '&rarr;'
+    pathstr = pathstr.replace('<-', left).replace('->', right)
+    reg = re.compile(r'&[l|r]{1}arr;')
+    seen_root = False
+    pretty_str = ''
+    split_string = re.split(reg, pathstr)
+    pretty_str += red(split_string[0].upper())
+    for piece in split_string[1:-1]:
+        split_piece = piece.split('-')
+        if len(split_piece) == 3:
+            pretty_str += green('%s%s-'%(left, split_piece[0]))
+            pretty_str += red(split_piece[1].upper())
+            pretty_str += green('-%s%s'%(split_piece[2], right))
+            seen_root = True
+        else:
+            assert len(split_piece) == 2
+            if not seen_root:
+                pretty_str += green('%s%s-'%(left, split_piece[0]))
+                pretty_str += blue(split_piece[1].lower())
+            else:
+                pretty_str += blue(split_piece[0].lower())
+                pretty_str += green('-%s%s'%(split_piece[1], right))
+    pretty_str += red(split_string[-1].upper())
+    return pretty_str
+
+def nicepath3(pathstr):
+    left = '&larr;'
+    right = '&rarr;'
+    pathstr = pathstr.replace('<-', left).replace('->', right)
+    reg = re.compile(r'&[l|r]{1}arr;')
+    seen_root = False
+    pretty_str = ''
+    for piece in re.split(reg, pathstr)[1:-1]:
+        split_piece = piece.split('-')
+        if len(split_piece) == 3:
+            pretty_str += green('%s%s-'%(left, split_piece[0]))
+            pretty_str += red(split_piece[1].upper())
+            pretty_str += green('-%s%s'%(split_piece[2], right))
+            seen_root = True
+        else:
+            assert len(split_piece) == 2
+            if not seen_root:
+                pretty_str += green('%s%s-'%(left, split_piece[0]))
+                pretty_str += blue(split_piece[1].lower())
+            else:
+                pretty_str += blue(split_piece[0].lower())
+                pretty_str += green('-%s%s'%(split_piece[1], right))
+    return pretty_str
+
 def nicepath(pathstr, html=True):
+    print pathstr
     d = json.loads(pathstr)
     s = nicepath2(d)
+    print s
+    print 
     if not html:
         s = re.sub(r'\<.*?\>', "", s)
         s = re.sub(" +", " ", s)

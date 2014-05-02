@@ -3,6 +3,8 @@ import numpy as np
 import util
 
 prefix = sys.argv[1]
+# prefix = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/enron_out/model.1000'
+
 def fname(suff): return prefix + "." + suff
 
 wc_thresh = 2
@@ -55,11 +57,13 @@ print
 for k in frameorder:
     top_paths = (-path_frames[:,k]).argsort()[:10]
     top_paths = top_paths[ path_frames[top_paths,k] >= wc_thresh]
-    pathelts = [util.nicepath(x) for x in path_vocab[top_paths]]
+    # pathelts = [util.nicepath(x) for x in path_vocab[top_paths]]
     # pathelts = ["%s <span class=wordinfo>(%.0f)</span>" % (util.nicepath(path_vocab[i]), path_frames[i,k]) for i in top_paths]
-    pathelts = ["%s" % (util.nicepath(path_vocab[i]),) for i in top_paths]
+    pathelts = [util.nicepath4(path_vocab[i]) for i in top_paths]
 
-    pathinfo = ',&nbsp; '.join(pathelts)
+    # pathinfo = ',&nbsp; '.join(pathelts)
+    pathinfo = '<br>'.join(pathelts)
+
     row = ['f=%s' % k, str(framecounts[k]),
             '%.3g' % alpha[k], '%.3g' % etaVar[k],
         ]
@@ -70,5 +74,4 @@ for k in frameorder:
 
 print "</tbody>"
 print "</table>"
-
 

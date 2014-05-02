@@ -1,7 +1,5 @@
-import os
-import re
-from collections import defaultdict
-import logging
+
+
 
 # DATA_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
 # OUT_DIR = '/Users/aaronschein/Documents/research/mlds/OConnor_IREvents_ACL2013/email_data/samples'
@@ -22,12 +20,14 @@ class EmailParser:
         self.good_file_count = 0
 
         self.logger = logging.getLogger('email_parser')
-        hdlr = logging.FileHandler(os.path.join(out_dir, '3_email_parser.log'))
+        hdlr = logging.FileHandler(os.path.join(out_dir, '4_email_parser.log'))
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
         hdlr.setFormatter(formatter)
         self.logger.addHandler(hdlr)
         self.logger.setLevel(logging.WARNING)
         self.logger.info('Initialized.')
+
+        self.misses = 0
 
     def recursive_walk(self, data_dir):
         for root, dirs, files in os.walk(data_dir):
@@ -77,12 +77,12 @@ class EmailParser:
         assert flag
         return (' '.join(main_lines)).strip()
 
+
     def parse(self, data_dir=None):
         if data_dir is None:
             data_dir = self.data_dir
 
         for full_path in self.recursive_walk(data_dir):
-            # print full_path
             with open(full_path, 'r') as f:
                 lines = list(nonblank_lines(f))
                 if 'Message-ID' not in lines[0]:
@@ -91,9 +91,11 @@ class EmailParser:
                 mi = lines[0].rstrip().split('Message-ID: ', 1)[1]
                 if mi in self.messages:
                     self.logger.info('Found duplicated MID in:\n\t\t\t%s'%full_path)
+                    self.misses += 1
                     continue
                 body = self.get_body(lines)
                 if len(body) == 0:
+                    self.misses += 1
                     continue
                 try:
                     ts = lines[1].rstrip().split('Date: ', 1)[1]
@@ -105,6 +107,7 @@ class EmailParser:
                         self.logger.error('Unexpected header lines:\n\t\t\t%s\n%s%s%s'%(full_path, sep, ' '.join(lines[:20]), sep))
                     except UnicodeDecodeError:
                         self.logger.error('Unexpected header lines:\n\t\t\t%s\nUnicode error.'%(full_path))
+                    self.misses += 1
                     continue
                 if not '@enron' in fr.lower():
                     continue
@@ -121,12 +124,12 @@ class EmailParser:
         if out_dir is None:
             out_dir = self.out_dir
 
-        with open(os.path.join(out_dir, '3_entities.tsv'), 'w+') as f:
+        with open(os.path.join(out_dir, '4_entities.tsv'), 'w+') as f:
             f.write('EMAIL|ALIASES\n')
             for email, aliases in self.entities.iteritems():
                 f.write('%s|%s\n'%(email, '|'.join(aliases)))
 
-        with open(os.path.join(out_dir, '3_messages.txt'), 'w+') as f:
+        with open(os.path.join(out_dir, '4_messages.txt'), 'w+') as f:
             f.write('MID|TIME|FROM|TO|BODY\n')
             for mid, (ts, fr, to, body) in self.messages.iteritems():
                 f.write('%s|%s|%s|%s|%s\n'%(mid, ts, fr, to, body))
@@ -147,7 +150,8 @@ if __name__ == '__main__':
     start = time.time()
     e = EmailParser(args.data, args.out)
     e.parse()
-    e.serialize()
+    print 'Misses: %d'%e.misses
+    # e.serialize()
     end = time.time() - start
     e.logger.info('Completed job for %d files out of %d total files in %f secs.'%(e.good_file_count, e.file_count, end))
     print 'Completed job for %d files out of %d total files in %f secs.'%(e.good_file_count, e.file_count, end)
